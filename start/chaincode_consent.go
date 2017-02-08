@@ -56,6 +56,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	if err != nil {
 		return nil, err
 	}
+	t.initUser(stub, args)
 
 	return nil, nil
 }
