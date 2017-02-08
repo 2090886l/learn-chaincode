@@ -56,7 +56,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	if err != nil {
 		return nil, err
 	}
-	t.initUser(stub, args)
+	//t.initUser(stub, args)
 
 	return nil, nil
 }
@@ -82,6 +82,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 	// Handle different functions
 	if function == "read" { //read a variable
+
 		return t.read(stub, args)
 	}
 	fmt.Println("query did not find func: " + function)
