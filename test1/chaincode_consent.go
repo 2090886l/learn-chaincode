@@ -19,8 +19,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
-	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -29,16 +27,12 @@ import (
 type SimpleChaincode struct {
 }
 
-// User simple User implementation
 type User struct {
 	Name    string `json:"name"`
 	Key     int64  `json:"key"`
 	Consent bool   `json:"consent"`
 }
 
-// ============================================================================================================================
-// Main
-// ============================================================================================================================
 func main() {
 	err := shim.Start(new(SimpleChaincode))
 	if err != nil {
@@ -60,7 +54,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	return nil, nil
 }
 
-// Invoke is our entry point to invoke a chaincode function
+// Invoke isur entry point to invoke a chaincode function
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("invoke is running " + function)
 
@@ -88,6 +82,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	return nil, errors.New("Received unknown function query: " + function)
 }
 
+// write - invoke function to write key/value pair
 func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var key, value string
 	var err error
@@ -97,7 +92,7 @@ func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string)
 		return nil, errors.New("Incorrect number of arguments. Expecting 2. name of the key and value to set")
 	}
 
-	key = args[0] //rename for fun
+	key = args[0] //rename for funsies
 	value = args[1]
 	err = stub.PutState(key, []byte(value)) //write the variable into the chaincode state
 	if err != nil {
@@ -106,6 +101,7 @@ func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string)
 	return nil, nil
 }
 
+// read - query function to read key/value pair
 func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var key, jsonResp string
 	var err error
@@ -122,36 +118,4 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	return valAsbytes, nil
-}
-
-func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var err error
-	key := rand.Int()
-
-	//   0
-	// "bob"
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 1")
-	}
-
-	//input sanitation
-	fmt.Println("- start init user")
-	if len(args[0]) <= 0 {
-		return nil, errors.New("argument must be a non-empty string")
-	}
-
-	name := args[0]
-	consent := false
-
-	//check if user already exists?
-
-	//build the marble json string manually
-	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": ` + strconv.FormatBool(consent) + `"}`
-	err = stub.PutState(name, []byte(str)) //store marble with id as key
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("- end init marble")
-	return nil, nil
 }
